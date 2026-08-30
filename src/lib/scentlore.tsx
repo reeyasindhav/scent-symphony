@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             return <Link key={item.label} to={item.to} onClick={() => setMobileOpen(false)} className={`flex h-11 items-center gap-3 rounded-md px-3 text-[13px] font-medium transition-all ${isActive(item.to) ? "bg-ink text-sidebar-primary-foreground shadow-[0_8px_20px_-12px_var(--color-ink)]" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}>
               <Icon className="size-[17px]" strokeWidth={1.7} />
               <span>{item.label}</span>
-              {item.count && <span className={`ml-auto text-[11px] ${isActive(item.to) ? "text-sidebar-primary-foreground/70" : "text-muted-foreground/80"}`}>{item.count}</span>}
+              {"count" in item && item.count && <span className={`ml-auto text-[11px] ${isActive(item.to) ? "text-sidebar-primary-foreground/70" : "text-muted-foreground/80"}`}>{item.count}</span>}
             </Link>;
           })}
         </nav>
