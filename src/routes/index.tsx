@@ -1,30 +1,300 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, Star } from "lucide-react";
-import { AppShell, EmptyLink, NoteVisualizer, ProductCard, SectionHeading, fragrances, ProductImage } from "@/lib/scentlore";
+import { ArrowRight, Bookmark, ChevronRight, Search, Star } from "lucide-react";
+import { useState } from "react";
+import {
+  PublicShell,
+  ProductCard,
+  NoteVisualizer,
+  ProductImage,
+  fragrances,
+  LogoutConfirmModal,
+} from "@/lib/scentlore";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [
-    { title: "Your Scent Story — Scentlore" },
-    { name: "description", content: "Discover fragrances that feel like you with Scentlore's visual scent journal." },
-    { property: "og:title", content: "Your Scent Story — Scentlore" },
-    { property: "og:description", content: "A more intuitive way to discover, review, and collect fragrance." },
-    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
-  ] }),
-  component: Dashboard,
+  head: () => ({
+    meta: [
+      { title: "Scentlore — The Fragrance Journal" },
+      {
+        name: "description",
+        content:
+          "Discover fragrances that feel like you with visual scent notes, mood filters, and a personal collection tracker.",
+      },
+      { property: "og:title", content: "Scentlore — The Fragrance Journal" },
+      {
+        property: "og:description",
+        content: "A more intuitive way to discover, review, and collect fragrance.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: LandingPage,
 });
 
-function Dashboard() {
-  return <AppShell><div className="animate-fade-in">
-    <div className="mb-8 flex items-end justify-between gap-5"><div><p className="eyebrow">Thursday · October 24</p><h1 className="mt-3 font-display text-[42px] leading-[.9] tracking-[-0.05em] text-ink sm:text-[54px]">Your scent story</h1><p className="mt-4 max-w-[450px] text-[13px] leading-6 text-muted-foreground">Discover fragrances that feel like you. Curated notes, honest reviews, and a wardrobe of scents to call your own.</p></div><EmptyLink>View all discoveries</EmptyLink></div>
-    <section className="grid overflow-hidden rounded-lg bg-ink text-sidebar-primary-foreground md:grid-cols-2" aria-label="Scent of the week">
-      <div className="flex flex-col justify-between p-7 sm:p-10"><div><p className="eyebrow text-gold">Scent of the week</p><h2 className="mt-6 max-w-[330px] font-display text-[42px] leading-[.9] tracking-[-0.04em] sm:text-[50px]">A quiet kind<br />of <em className="text-gold">luxury.</em></h2><p className="mt-6 max-w-[390px] text-[13px] leading-6 text-sidebar-primary-foreground/65">Woody, warm, and quietly magnetic. Gris Charnel is the olfactive equivalent of your favorite cashmere sweater.</p></div><div className="mt-9 flex flex-wrap items-center gap-5"><Link to="/fragrance/$slug" params={{ slug: "gris-charnel" }} className="inline-flex h-10 items-center gap-2 rounded-md bg-gold px-5 text-[11px] font-bold text-ink transition hover:bg-gold/85">Explore fragrance <ChevronRight className="size-3" /></Link><span className="flex items-center gap-1.5 text-[11px] text-sidebar-primary-foreground/70"><Star className="size-3.5 fill-gold text-gold" /> 4.8 <span>(328 reviews)</span></span></div></div>
-      <div className="relative min-h-[300px] overflow-hidden bg-plum"><ProductImage alt="Gris Charnel perfume bottle" className="opacity-90" /><span className="absolute bottom-5 left-6 text-[9px] uppercase tracking-[0.22em] text-sidebar-primary-foreground/55">Eau de parfum · 100ml</span></div>
-    </section>
+function LandingPage() {
+  const { isAuthenticated, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-    <section className="mt-12"><SectionHeading eyebrow="Find your feeling" title="Explore by mood" action={<EmptyLink>See all moods</EmptyLink>} /><div className="flex flex-wrap gap-2">{["All moods", "Sensual", "Confident", "Serene", "Playful"].map((mood, i) => <Link key={mood} to="/discover" search={{ mood: mood.toLowerCase().replace(" ", "-") }} className={`rounded-full border px-4 py-2 text-[11px] transition ${i === 0 ? "border-ink bg-ink text-sidebar-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-gold hover:text-ink"}`}>{mood}</Link>)}</div></section>
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    logout();
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 0);
+  };
 
-    <section className="mt-12"><SectionHeading eyebrow="The edit" title="Trending fragrances" action={<EmptyLink to="/discover">Browse catalogue</EmptyLink>} /><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{fragrances.slice(0, 3).map((product, index) => <ProductCard key={product.name} product={product} index={index} />)}</div></section>
+  return (
+    <PublicShell>
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 sm:py-24 lg:px-11 lg:py-32">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+            <div className="flex flex-col justify-center">
+              <p className="eyebrow">The fragrance journal</p>
+              <h1 className="mt-6 font-display text-5xl leading-[.95] tracking-[-0.05em] text-ink sm:text-6xl lg:text-7xl">
+                Discover the scent <br />
+                that tells your <em className="text-plum">story.</em>
+              </h1>
+              <p className="mt-6 max-w-lg text-[13px] leading-7 text-muted-foreground sm:text-[14px]">
+                Scentlore turns invisible scent profiles into intuitive visuals. Filter by mood and
+                occasion, read honest reviews, and build a wardrobe of fragrances that feel
+                unmistakably like you.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link to="/discover">
+                  <Button className="h-11 bg-ink px-6 text-[11px] font-semibold text-sidebar-primary-foreground hover:bg-plum">
+                    Start discovering <ArrowRight className="size-3.5" />
+                  </Button>
+                </Link>
+                {!isAuthenticated && (
+                  <Link to="/auth/signup">
+                    <Button variant="outline" className="h-11 px-6 text-[11px] font-semibold">
+                      Create free account
+                    </Button>
+                  </Link>
+                )}
+                {isAuthenticated && (
+                  <Button variant="outline" onClick={() => setShowLogoutConfirm(true)} className="h-11 px-6 text-[11px] font-semibold" type="button">
+                    Log out
+                  </Button>
+                )}
+              </div>
+              <div className="mt-8 flex items-center gap-4">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="grid size-8 place-items-center rounded-full border-2 border-background bg-soft-gold font-display text-[11px] text-ink"
+                    >
+                      M{i}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Loved by <strong className="font-semibold text-ink">12,000+</strong> scent
+                  explorers
+                </p>
+              </div>
+            </div>
+            <div className="relative flex items-center justify-center">
+              <div className="relative h-[400px] w-full overflow-hidden rounded-2xl bg-plum sm:h-[500px] lg:h-[600px]">
+                <ProductImage alt="Hero fragrance bottle" className="opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-plum/40 to-transparent" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 rounded-xl bg-card p-4 shadow-lg border border-border sm:left-8">
+                <div className="flex items-center gap-2">
+                  <div className="grid size-8 place-items-center rounded-full bg-soft-gold text-ink">
+                    <Star className="size-4 fill-gold text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-ink">4.8 · 328 reviews</p>
+                    <p className="text-[10px] text-muted-foreground">Gris Charnel · BDK Parfums</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <section className="mt-12 grid gap-4 lg:grid-cols-[1.5fr_1fr]"><div className="rounded-md border border-border bg-card p-6 sm:p-8"><SectionHeading eyebrow="Olfactive map" title="The anatomy of a scent" action={<EmptyLink>Read notes guide</EmptyLink>} /><div className="flex flex-col items-center gap-5 sm:flex-row sm:justify-between"><NoteVisualizer /><p className="sr-only">A note visualizer showing Bergamot, Iris, and Sandalwood.</p></div></div><div className="rounded-md bg-soft-stone p-6 sm:p-8"><div className="flex justify-between"><div><p className="eyebrow text-muted-foreground">Your wardrobe</p><h2 className="mt-4 max-w-[220px] font-display text-[30px] leading-[.95] tracking-[-0.04em] text-ink">A collection<br />in the making.</h2></div><span className="text-gold">♧</span></div><div className="mt-12"><div className="flex items-center justify-between font-display text-xl text-ink"><span>I <small className="text-muted-foreground">/ 12</small></span><small className="font-sans text-[10px] text-muted-foreground">8% curated</small></div><div className="mt-3 h-1 rounded-full bg-ink/10"><div className="h-full w-[8%] rounded-full bg-gold" /></div><Link to="/collection" className="mt-6 inline-flex items-center gap-2 text-[11px] font-semibold text-ink">Open my collection <ChevronRight className="size-3" /></Link></div></div></section>
-  </div></AppShell>;
+      {/* Features */}
+      <section className="border-t border-border bg-soft-stone/50">
+        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 sm:py-24 lg:px-11">
+          <div className="text-center">
+            <p className="eyebrow">Why Scentlore</p>
+            <h2 className="mt-3 font-display text-3xl tracking-[-0.04em] text-ink sm:text-4xl">
+              Fragrance, finally visible.
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-[13px] leading-7 text-muted-foreground">
+              We built the tools we wish existed: visual note maps, mood-based discovery, and a
+              collection tracker that makes your wardrobe feel like a gallery.
+            </p>
+          </div>
+          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-xl border border-border bg-card p-8 transition hover:-translate-y-1 hover:shadow-lg">
+              <div className="grid size-12 place-items-center rounded-lg bg-soft-gold text-ink">
+                <Search className="size-5" strokeWidth={1.5} />
+              </div>
+              <h3 className="mt-5 font-display text-xl text-ink">Visual scent notes</h3>
+              <p className="mt-3 text-[13px] leading-6 text-muted-foreground">
+                See how top, heart, and base notes evolve with our interactive note visualizer. No
+                more guessing what a fragrance actually smells like.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-8 transition hover:-translate-y-1 hover:shadow-lg">
+              <div className="grid size-12 place-items-center rounded-lg bg-soft-gold text-ink">
+                <Star className="size-5" strokeWidth={1.5} />
+              </div>
+              <h3 className="mt-5 font-display text-xl text-ink">Mood &amp; occasion filter</h3>
+              <p className="mt-3 text-[13px] leading-6 text-muted-foreground">
+                Filter by feeling — confident, serene, sensual — or by the moment. Find the perfect
+                scent for boardrooms, date nights, or lazy Sundays.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-8 transition hover:-translate-y-1 hover:shadow-lg">
+              <div className="grid size-12 place-items-center rounded-lg bg-soft-gold text-ink">
+                <Bookmark className="size-5" strokeWidth={1.5} />
+              </div>
+              <h3 className="mt-5 font-display text-xl text-ink">Collection tracker</h3>
+              <p className="mt-3 text-[13px] leading-6 text-muted-foreground">
+                Organise your wardrobe, track wear frequency, and share your curated shelf. Your
+                personal fragrance journal, beautifully kept.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Note Visualizer Preview */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 sm:py-24 lg:px-11">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+            <div>
+              <p className="eyebrow">Olfactive map</p>
+              <h2 className="mt-3 font-display text-3xl tracking-[-0.04em] text-ink sm:text-4xl">
+                The anatomy of a scent.
+              </h2>
+              <p className="mt-4 text-[13px] leading-7 text-muted-foreground">
+                Every great fragrance tells a story in three acts. Our note visualizer maps the
+                journey from bright opening to lingering base, so you can see the full picture at a
+                glance.
+              </p>
+              <Link to="/auth/signup" className="inline-flex mt-8">
+                <Button className="h-11 bg-ink px-6 text-[11px] font-semibold text-sidebar-primary-foreground hover:bg-plum">
+                  Start exploring <ArrowRight className="size-3.5" />
+                </Button>
+              </Link>
+            </div>
+            <div className="flex justify-center">
+              <NoteVisualizer />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trending */}
+      <section className="border-t border-border bg-soft-stone/50">
+        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 sm:py-24 lg:px-11">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="eyebrow">The edit</p>
+              <h2 className="mt-3 font-display text-3xl tracking-[-0.04em] text-ink sm:text-4xl">
+                Trending this season.
+              </h2>
+            </div>
+            <Link
+              to="/discover"
+              className="hidden sm:inline-flex items-center gap-2 text-[11px] font-semibold text-ink underline decoration-gold decoration-2 underline-offset-8 hover:text-plum"
+            >
+              Browse all <ChevronRight className="size-3" />
+            </Link>
+          </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {fragrances.slice(0, 3).map((product, index) => (
+              <ProductCard key={product.name} product={product} index={index} />
+            ))}
+          </div>
+          <div className="mt-8 text-center sm:hidden">
+            <Link
+              to="/discover"
+              className="inline-flex items-center gap-2 text-[11px] font-semibold text-ink underline decoration-gold decoration-2 underline-offset-8"
+            >
+              Browse all <ChevronRight className="size-3" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonial */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 sm:py-24 lg:px-11">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="flex justify-center gap-1 text-gold">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star key={i} className="size-5 fill-gold" />
+              ))}
+            </div>
+            <blockquote className="mt-8 font-display text-2xl leading-[1.2] tracking-[-0.02em] text-ink sm:text-3xl">
+              "Scentlore changed how I shop for fragrance. I used to buy blind and regret it. Now I
+              understand exactly what I'm getting into."
+            </blockquote>
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <div className="grid size-10 place-items-center rounded-full bg-soft-gold font-display text-sm text-ink">
+                EW
+              </div>
+              <div className="text-left">
+                <p className="text-[12px] font-semibold text-ink">Elena Whitfield</p>
+                <p className="text-[11px] text-muted-foreground">Perfume collector · London</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-border bg-ink text-sidebar-primary-foreground">
+        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 sm:py-24 lg:px-11">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow text-gold">Get started</p>
+            <h2 className="mt-4 font-display text-4xl tracking-[-0.04em] sm:text-5xl">
+              Your scent story starts here.
+            </h2>
+            <p className="mt-4 text-[13px] leading-7 text-sidebar-primary-foreground/70">
+              Create your free account today and begin building a fragrance wardrobe that's truly
+              yours. No credit card required.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              {!isAuthenticated && (
+                <Link to="/auth/signup">
+                  <Button className="h-11 bg-gold px-8 text-[11px] font-bold text-ink hover:bg-gold/85">
+                    Create free account
+                  </Button>
+                </Link>
+              )}
+              {isAuthenticated && (
+                <Button onClick={() => setShowLogoutConfirm(true)} className="h-11 bg-gold px-8 text-[11px] font-bold text-ink hover:bg-gold/85" type="button">
+                  Log out
+                </Button>
+              )}
+              <Link to="/discover">
+                <Button
+                  variant="outline"
+                  className="h-11 bg-transparent border-sidebar-primary-foreground/30 px-8 text-[11px] font-semibold text-sidebar-primary-foreground hover:bg-sidebar-primary-foreground/10"
+                >
+                  Explore fragrances
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+      <LogoutConfirmModal
+        open={showLogoutConfirm}
+        onConfirm={confirmLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
+    </PublicShell>
+  );
 }
